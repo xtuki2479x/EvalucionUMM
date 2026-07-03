@@ -351,7 +351,7 @@ function generarHoroscopoDiario(signo) {
 
 document.addEventListener("DOMContentLoaded", () => {
   renderizarCatalogo();
-  actualizarSesion();
+  sincronizarSesionBackend();
   actualizarContadorCarrito();
 
   EventBus.subscribe(
@@ -601,16 +601,32 @@ function cerrarDetalle() {
    SESIÓN
 ================================================== */
 
-function manejarSesion() {
+async function manejarSesion() {
   if (getSesion()) {
-    localStorage.removeItem(KEYS.sesion);
+    try {
+      const respuesta = await fetch(
+        "/api/auth/logout",
+        { method: "POST" }
+      );
 
+      if (!respuesta.ok) {
+        throw new Error(
+          "No fue posible cerrar la sesión."
+        );
+      }
+    } catch (error) {
+      mostrarToast(error.message);
+      return;
+    }
+
+    localStorage.removeItem(KEYS.sesion);
     actualizarSesion();
-    mostrarToast("Sesión cerrada");
+    mostrarToast("Sesión cerrada correctamente");
 
     return;
   }
 
+  mostrarMensajeSesion("");
   document
     .getElementById("modal-sesion")
     .classList.remove("hidden");
@@ -622,31 +638,125 @@ function cerrarModalSesion() {
     .classList.add("hidden");
 }
 
-function iniciarSesion(evento) {
+async function iniciarSesion(evento) {
   evento.preventDefault();
-
-  const nombre = document
-    .getElementById("nombre")
-    .value
-    .trim();
 
   const correo = document
     .getElementById("correo")
     .value
-    .trim();
+    .trim()
+    .toLowerCase();
 
-  guardar(KEYS.sesion, {
-    nombre,
-    correo,
-    rol: "usuario"
-  });
+  const password = document
+    .getElementById("password")
+    .value;
 
-  cerrarModalSesion();
-  actualizarSesion();
+  const boton = document
+    .getElementById("btn-enviar-sesion");
 
-  mostrarToast(
-    "Sesión iniciada correctamente"
-  );
+  if (!validarFormularioSesion(correo, password)) {
+    return;
+  }
+
+  boton.disabled = true;
+  boton.textContent = "Verificando...";
+  mostrarMensajeSesion("");
+
+  try {
+    const respuesta = await fetch(
+      "/api/auth/login",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ correo, password })
+      }
+    );
+
+    const datos = await respuesta.json();
+
+    if (!respuesta.ok) {
+      throw new Error(
+        datos.mensaje ||
+        "No fue posible iniciar sesión."
+      );
+    }
+
+    guardar(KEYS.sesion, datos.usuario);
+    document
+      .getElementById("form-sesion")
+      .reset();
+
+    cerrarModalSesion();
+    actualizarSesion();
+    mostrarToast(datos.mensaje);
+  } catch (error) {
+    mostrarMensajeSesion(
+      error.message,
+      "error"
+    );
+  } finally {
+    boton.disabled = false;
+    boton.textContent = "Iniciar sesión";
+  }
+}
+
+function validarFormularioSesion(correo, password) {
+  const expresionCorreo =
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (!expresionCorreo.test(correo)) {
+    mostrarMensajeSesion(
+      "Ingresa un correo electrónico válido.",
+      "error"
+    );
+    return false;
+  }
+
+  if (password.length < 8) {
+    mostrarMensajeSesion(
+      "La contraseña debe tener al menos 8 caracteres.",
+      "error"
+    );
+    return false;
+  }
+
+  return true;
+}
+
+function mostrarMensajeSesion(mensaje, tipo = "") {
+  const elemento = document
+    .getElementById("mensaje-sesion");
+
+  elemento.textContent = mensaje;
+  elemento.className = mensaje
+    ? `mensaje-sesion mensaje-sesion--${tipo}`
+    : "mensaje-sesion hidden";
+}
+
+async function sincronizarSesionBackend() {
+  try {
+    const respuesta = await fetch(
+      "/api/auth/me"
+    );
+
+    if (!respuesta.ok) {
+      localStorage.removeItem(KEYS.sesion);
+      actualizarSesion();
+      return;
+    }
+
+    const datos = await respuesta.json();
+    guardar(KEYS.sesion, datos.usuario);
+    actualizarSesion();
+  } catch (_error) {
+    localStorage.removeItem(KEYS.sesion);
+    actualizarSesion();
+    mostrarToast(
+      "Inicia el proyecto con npm start."
+    );
+  }
 }
 
 function actualizarSesion() {
