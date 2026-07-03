@@ -1,74 +1,106 @@
+const fs = require("node:fs");
 const path = require("node:path");
 const { DatabaseSync } = require("node:sqlite");
-const bcrypt = require("bcryptjs");
-
-function crearBaseDatos(rutaBaseDatos) {
-  const baseDatos = new DatabaseSync(rutaBaseDatos);
-
-  baseDatos.exec(`
-    PRAGMA foreign_keys = ON;
-
-    CREATE TABLE IF NOT EXISTS usuarios (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      nombre TEXT NOT NULL,
-      correo TEXT NOT NULL UNIQUE COLLATE NOCASE,
-      password_hash TEXT NOT NULL,
-      rol TEXT NOT NULL DEFAULT 'usuario',
-      activo INTEGER NOT NULL DEFAULT 1,
-      creado_en TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-    );
-  `);
-
-  return baseDatos;
-}
-
-function crearUsuarioInicial(baseDatos) {
-  const correo = "demo@espacio.cl";
-  const usuarioExistente = baseDatos
-    .prepare("SELECT id FROM usuarios WHERE correo = ?")
-    .get(correo);
-
-  if (usuarioExistente) {
-    return;
-  }
-
-  const passwordHash = bcrypt.hashSync("Demo1234", 10);
-
-  baseDatos
-    .prepare(`
-      INSERT INTO usuarios (nombre, correo, password_hash, rol)
-      VALUES (?, ?, ?, ?)
-    `)
-    .run("Usuario Demo", correo, passwordHash, "usuario");
-}
-
-function obtenerUsuarioPorCorreo(baseDatos, correo) {
-  return baseDatos
-    .prepare(`
-      SELECT id, nombre, correo, password_hash, rol, activo
-      FROM usuarios
-      WHERE correo = ?
-    `)
-    .get(correo);
-}
-
-function usuarioPublico(usuario) {
-  return {
-    id: usuario.id,
-    nombre: usuario.nombre,
-    correo: usuario.correo,
-    rol: usuario.rol
-  };
-}
 
 function rutaBaseDatosPredeterminada() {
   return path.join(__dirname, "..", "data", "app.db");
 }
 
+function obtenerColumnas(baseDatos, tabla) {
+  return baseDatos
+    .prepare(`PRAGMA table_info(${tabla})`)
+    .all()
+    .map((columna) => columna.name);
+}
+
+function prepararMigracionUsuarios(baseDatos) {
+  const tablaUsuarios = baseDatos
+    .prepare(`
+      SELECT name
+      FROM sqlite_master
+      WHERE type = 'table' AND name = 'usuarios'
+    `)
+    .get();
+
+  if (!tablaUsuarios) {
+    return null;
+  }
+
+  const columnas = obtenerColumnas(baseDatos, "usuarios");
+
+  if (columnas.includes("email") || !columnas.includes("correo")) {
+    return null;
+  }
+
+  baseDatos.exec(
+    "ALTER TABLE usuarios RENAME TO usuarios_legacy"
+  );
+
+  return new Set(columnas);
+}
+
+function copiarUsuariosLegacy(baseDatos, columnas) {
+  if (!columnas) {
+    return;
+  }
+
+  const password = columnas.has("password_hash")
+    ? "password_hash"
+    : "password";
+  const rol = columnas.has("rol") ? "rol" : "'usuario'";
+  const activo = columnas.has("activo") ? "activo" : "1";
+  const creadoEn = columnas.has("creado_en")
+    ? "creado_en"
+    : "CURRENT_TIMESTAMP";
+
+  baseDatos.exec(`
+    INSERT INTO usuarios (
+      id,
+      nombre,
+      email,
+      password_hash,
+      rol,
+      activo,
+      creado_en
+    )
+    SELECT
+      id,
+      nombre,
+      correo,
+      ${password},
+      ${rol},
+      ${activo},
+      ${creadoEn}
+    FROM usuarios_legacy;
+
+    DROP TABLE usuarios_legacy;
+  `);
+}
+
+function crearBaseDatos(rutaBaseDatos = rutaBaseDatosPredeterminada()) {
+  if (rutaBaseDatos !== ":memory:") {
+    fs.mkdirSync(path.dirname(rutaBaseDatos), {
+      recursive: true
+    });
+  }
+
+  const baseDatos = new DatabaseSync(rutaBaseDatos);
+  baseDatos.exec("PRAGMA foreign_keys = ON;");
+
+  const columnasLegacy =
+    prepararMigracionUsuarios(baseDatos);
+  const esquema = fs.readFileSync(
+    path.join(__dirname, "..", "database.sql"),
+    "utf8"
+  );
+
+  baseDatos.exec(esquema);
+  copiarUsuariosLegacy(baseDatos, columnasLegacy);
+
+  return baseDatos;
+}
+
 module.exports = {
   crearBaseDatos,
-  crearUsuarioInicial,
-  obtenerUsuarioPorCorreo,
-  rutaBaseDatosPredeterminada,
-  usuarioPublico
+  rutaBaseDatosPredeterminada
 };
