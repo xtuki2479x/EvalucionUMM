@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Mi Espacio Esotérico</title>
+
+  <link rel="stylesheet" href="../css/global.css">
+  <link rel="stylesheet" href="principal.css">
+</head>
+
+<body>
+
+  <nav class="navbar">
+    <a class="navbar__logo" href="principal.html">
+      Mi Espacio <span>Esotérico</span>
+    </a>
+
+    <div class="navbar__links">
+      <a class="activo" href="principal.html">Inicio</a>
+      <a href="#catalogo">Servicios</a>
+      <a href="../Chat/chat.html">Chat</a>
+    </div>
+
+    <div class="navbar__acciones">
+      <button
+        id="btn-sesion"
+        class="btn btn--secundario"
+        type="button"
+      >
+        Iniciar sesión
+      </button>
+
+      <a
+        class="btn btn--icono btn--secundario"
+        href="../Carrito/carrito.html"
+        aria-label="Abrir carrito"
+        title="Carrito"
+      >
+        🛒
+        <span
+          class="contador hidden"
+          data-cart-count
+        ></span>
+      </a>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="hero__contenido contenedor">
+    <p class="hero__eyebrow">
+        Bienvenido a nuestra comunidad
+    </p>
+
+      <h1>Un espacio para mirar hacia dentro</h1>
+
+    <p>
+        Descubre servicios esotéricos personalizados, productos seleccionados y herramientas espirituales para acompañarte en tu camino hacia el equilibrio y el bienestar.
+    </p>
+
+      <a class="btn btn--primario" href="#catalogo">
+        Ver servicios
+      </a>
+    </div>
+  </header>
+
+  <main id="catalogo" class="contenedor contenido">
+
+    <!-- CATÁLOGO DE LECTURAS -->
+
+    <section class="seccion">
+      <div class="seccion__encabezado">
+        <div>
+          <p class="texto-suave">Catálogo</p>
+          <h2 class="titulo">Lecturas</h2>
+        </div>
+
+        <div>
+          <button
+            class="flecha"
+            data-carrusel="lecturas"
+            data-dir="-1"
+            aria-label="Anterior"
+          >
+            ←
+          </button>
+
+          <button
+            class="flecha"
+            data-carrusel="lecturas"
+            data-dir="1"
+            aria-label="Siguiente"
+          >
+            →
+          </button>
+        </div>
+      </div>
+
+      <div class="carrusel" id="lecturas"></div>
+    </section>
+
+    <!-- CATÁLOGO DE ASTROLOGÍA -->
+
+    <section class="seccion">
+      <div class="seccion__encabezado">
+        <div>
+          <p class="texto-suave">Catálogo</p>
+          <h2 class="titulo">Astrología</h2>
+        </div>
+
+        <div>
+          <button
+            class="flecha"
+            data-carrusel="astrologia"
+            data-dir="-1"
+            aria-label="Anterior"
+          >
+            ←
+          </button>
+
+          <button
+            class="flecha"
+            data-carrusel="astrologia"
+            data-dir="1"
+            aria-label="Siguiente"
+          >
+            →
+          </button>
+        </div>
+      </div>
+
+      <div class="carrusel" id="astrologia"></div>
+    </section>
+
+    <!-- CATÁLOGO DE RUNAS -->
+
+<section class="seccion">
+  <div class="seccion__encabezado">
+    <div>
+      <p class="texto-suave">Catálogo</p>
+      <h2 class="titulo">Runas</h2>
+    </div>
+
+    <div>
+      <button
+        class="flecha"
+        data-carrusel="runas"
+        data-dir="-1"
+        aria-label="Anterior"
+      >
+        ←
+      </button>
+
+      <button
+        class="flecha"
+        data-carrusel="runas"
+        data-dir="1"
+        aria-label="Siguiente"
+      >
+        →
+      </button>
+    </div>
+  </div>
+
+  <div class="carrusel" id="runas"></div>
+</section>
+
+
+<!-- CATÁLOGO DE LIMPIEZAS -->
+
+<section class="seccion">
+  <div class="seccion__encabezado">
+    <div>
+      <p class="texto-suave">Catálogo</p>
+      <h2 class="titulo">Limpiezas energéticas</h2>
+    </div>
+
+    <div>
+      <button
+        class="flecha"
+        data-carrusel="limpiezas"
+        data-dir="-1"
+        aria-label="Anterior"
+      >
+        ←
+      </button>
+
+      <button
+        class="flecha"
+        data-carrusel="limpiezas"
+        data-dir="1"
+        aria-label="Siguiente"
+      >
+        →
+      </button>
+    </div>
+  </div>
+
+  <div class="carrusel" id="limpiezas"></div>
+</section>
+
+
+<!-- CATÁLOGO DE AMULETOS -->
+
+<section class="seccion">
+  <div class="seccion__encabezado">
+    <div>
+      <p class="texto-suave">Tienda</p>
+      <h2 class="titulo">Amuletos y productos</h2>
+    </div>
+
+    <div>
+      <button
+        class="flecha"
+        data-carrusel="amuletos"
+        data-dir="-1"
+        aria-label="Anterior"
+      >
+        ←
+      </button>
+
+      <button
+        class="flecha"
+        data-carrusel="amuletos"
+        data-dir="1"
+        aria-label="Siguiente"
+      >
+        →
+      </button>
+    </div>
+  </div>
+
+  <div class="carrusel" id="amuletos"></div>
+</section>
+
+    <!-- PLANES PREMIUM -->
+
+    <section class="seccion">
+      <p class="texto-suave">Suscripciones</p>
+      <h2 class="titulo">Planes premium</h2>
+
+      <div class="planes">
+
+        <article class="plan">
+          <h3>Plan Inicial</h3>
+          <strong>Gratis</strong>
+
+          <p>
+            Acceso al catálogo y a las calculadoras básicas.
+          </p>
+
+          <button
+            class="btn btn--secundario btn--bloque"
+            disabled
+          >
+            Plan actual
+          </button>
+        </article>
+
+        <article class="plan plan--destacado">
+          <span class="badge">Recomendado</span>
+
+          <h3>Plan Lunar</h3>
+          <strong>$9.990 / mes</strong>
+
+          <p>
+            Acceso al chat y a contenido espiritual ampliado.
+          </p>
+
+          <button
+            class="btn btn--primario btn--bloque"
+            data-plan="Plan Lunar"
+          >
+            Suscribirme
+          </button>
+        </article>
+
+        <article class="plan">
+          <h3>Plan Cosmos</h3>
+          <strong>$16.990 / mes</strong>
+
+          <p>
+            Todos los beneficios, contenido exclusivo y prioridad.
+          </p>
+
+          <button
+            class="btn btn--secundario btn--bloque"
+            data-plan="Plan Cosmos"
+          >
+            Suscribirme
+          </button>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- CARTAS Y HORÓSCOPO -->
+
+    <section class="seccion">
+      <p class="texto-suave">Herramientas</p>
+      <h2 class="titulo">Tu carta del cielo</h2>
+
+      <div class="calculadoras">
+
+        <article class="calculadora">
+          <h3>Arcano de nacimiento</h3>
+
+          <p>
+            Descubre tu arcano de nacimiento.
+          </p>
+
+          <input
+            type="date"
+            id="fecha-natal"
+            aria-label="Fecha de nacimiento"
+          >
+
+          <button
+            class="btn btn--primario btn--bloque"
+            data-calcular="natal"
+          >
+            Calcular
+          </button>
+
+          <div
+            class="resultado"
+            id="resultado-natal"
+          ></div>
+        </article>
+
+        <article class="calculadora">
+          <h3>Arcano anual</h3>
+
+          <p>
+            Conoce la energía asociada a un ciclo anual.
+          </p>
+
+          <input
+            type="date"
+            id="fecha-anual"
+            aria-label="Fecha de nacimiento"
+          >
+
+          <button
+            class="btn btn--primario btn--bloque"
+            data-calcular="anual"
+          >
+            Calcular
+          </button>
+
+          <div
+            class="resultado"
+            id="resultado-anual"
+          ></div>
+        </article>
+
+        <article class="calculadora">
+          <h3>Horóscopo</h3>
+
+          <p>
+            Identifica tu signo según tu fecha de nacimiento.
+          </p>
+
+          <input
+            type="date"
+            id="fecha-signo"
+            aria-label="Fecha de nacimiento"
+          >
+
+          <button
+            class="btn btn--primario btn--bloque"
+            data-calcular="signo"
+          >
+            Ver signo
+          </button>
+
+          <div
+            class="resultado"
+            id="resultado-signo"
+          ></div>
+        </article>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- PANEL LATERAL DEL SERVICIO -->
+
+  <aside
+    id="detalle"
+    class="panel panel--izq"
+    aria-label="Detalle del servicio"
+  >
+    <button
+      class="panel__cerrar"
+      data-cerrar
+      aria-label="Cerrar panel"
+    >
+      ✕
+    </button>
+
+    <img id="detalle-imagen" src="" alt="Imagen del servicio">
+
+    <div class="panel__cuerpo">
+      <span
+        id="detalle-categoria"
+        class="badge"
+      ></span>
+
+      <h2 id="detalle-nombre"></h2>
+
+      <strong id="detalle-precio"></strong>
+
+      <p id="detalle-descripcion"></p>
+
+      <button
+        id="detalle-agregar"
+        class="btn btn--primario btn--bloque"
+      >
+        Agregar al carrito
+      </button>
+    </div>
+  </aside>
+
+  <div
+    id="overlay"
+    class="overlay"
+    data-cerrar
+  ></div>
+
+  <!-- MODAL DE INICIO DE SESIÓN -->
+
+  <div
+    id="modal-sesion"
+    class="modal hidden"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="titulo-sesion"
+  >
+    <form id="form-sesion" class="modal__caja">
+
+      <button
+        class="modal__cerrar"
+        type="button"
+        data-cerrar-modal
+        aria-label="Cerrar"
+      >
+        ✕
+      </button>
+
+      <h2 id="titulo-sesion" class="modal__titulo">
+        Acceso de usuario
+      </h2>
+
+      <div class="campo">
+        <label for="nombre">Nombre</label>
+
+        <input
+          id="nombre"
+          type="text"
+          required
+          placeholder="Tu nombre"
+        >
+      </div>
+
+      <div class="campo">
+        <label for="correo">Correo</label>
+
+        <input
+          id="correo"
+          type="email"
+          required
+          placeholder="nombre@correo.cl"
+        >
+      </div>
+
+      <button class="btn btn--primario btn--bloque">
+        Entrar o registrarme
+      </button>
+
+      <p class="texto-suave">
+        Este acceso es simulado para la demostración.
+      </p>
+
+    </form>
+  </div>
+
+  <div id="toast-container"></div>
+
+  <footer class="footer">
+
+    <div class="contenedor">
+
+        <p>
+            © 2026 Mi Espacio Esotérico. Todos los derechos reservados.
+        </p>
+
+        <p class="texto-suave">
+            Descubre servicios espirituales, productos esotéricos y herramientas para tu bienestar.
+        </p>
+
+    </div>
+
+</footer>
+
+<script src="../js/funciones.js"></script>
+<script src="principal.js"></script>
+
+</body>
+</html>
