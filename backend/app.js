@@ -4,10 +4,15 @@ const session = require("express-session");
 const bcrypt = require("bcryptjs");
 const { crearBaseDatos } = require("./database");
 const { crearUserModel } = require("./models/userModel");
+const { crearOrderModel } = require("./models/orderModel");
 const {
   crearAuthController
 } = require("./controllers/authController");
+const {
+  crearOrderController
+} = require("./controllers/orderController");
 const { crearAuthRoutes } = require("./routes/authRoutes");
+const { crearOrderRoutes } = require("./routes/orderRoutes");
 
 function crearUsuarioInicial(userModel) {
   const email = "demo@espacio.cl";
@@ -31,6 +36,7 @@ function crearAplicacion(opciones = {}) {
     opciones.baseDatos ||
     crearBaseDatos(opciones.rutaBaseDatos);
   const userModel = crearUserModel(baseDatos);
+  const orderModel = crearOrderModel(baseDatos);
 
   crearUsuarioInicial(userModel);
 
@@ -55,10 +61,15 @@ function crearAplicacion(opciones = {}) {
   );
 
   const authController = crearAuthController(userModel);
+  const orderController = crearOrderController(orderModel);
 
   app.use(
     "/api/auth",
     crearAuthRoutes(authController)
+  );
+  app.use(
+    "/api/orders",
+    crearOrderRoutes(orderController)
   );
 
   app.use(express.static(rutaProyecto));
@@ -83,7 +94,7 @@ function crearAplicacion(opciones = {}) {
   return {
     app,
     baseDatos,
-    models: { userModel }
+    models: { orderModel, userModel }
   };
 }
 
