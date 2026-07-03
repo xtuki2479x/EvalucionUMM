@@ -6,13 +6,22 @@ const { crearBaseDatos } = require("./database");
 const { crearUserModel } = require("./models/userModel");
 const { crearOrderModel } = require("./models/orderModel");
 const {
+  crearMessageModel
+} = require("./models/messageModel");
+const {
   crearAuthController
 } = require("./controllers/authController");
 const {
   crearOrderController
 } = require("./controllers/orderController");
+const {
+  crearMessageController
+} = require("./controllers/messageController");
 const { crearAuthRoutes } = require("./routes/authRoutes");
 const { crearOrderRoutes } = require("./routes/orderRoutes");
+const {
+  crearMessageRoutes
+} = require("./routes/messageRoutes");
 
 function crearUsuarioInicial(userModel) {
   const email = "demo@espacio.cl";
@@ -37,6 +46,7 @@ function crearAplicacion(opciones = {}) {
     crearBaseDatos(opciones.rutaBaseDatos);
   const userModel = crearUserModel(baseDatos);
   const orderModel = crearOrderModel(baseDatos);
+  const messageModel = crearMessageModel(baseDatos);
 
   crearUsuarioInicial(userModel);
 
@@ -62,6 +72,8 @@ function crearAplicacion(opciones = {}) {
 
   const authController = crearAuthController(userModel);
   const orderController = crearOrderController(orderModel);
+  const messageController =
+    crearMessageController(messageModel);
 
   app.use(
     "/api/auth",
@@ -70,6 +82,10 @@ function crearAplicacion(opciones = {}) {
   app.use(
     "/api/orders",
     crearOrderRoutes(orderController)
+  );
+  app.use(
+    "/api/messages",
+    crearMessageRoutes(messageController)
   );
 
   app.use(express.static(rutaProyecto));
@@ -94,7 +110,7 @@ function crearAplicacion(opciones = {}) {
   return {
     app,
     baseDatos,
-    models: { orderModel, userModel }
+    models: { messageModel, orderModel, userModel }
   };
 }
 
