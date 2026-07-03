@@ -409,3 +409,24 @@
   cursor: wait;
   opacity: .7;
 }
+
+
+.modal__cambio {
+  margin-top: 15px;
+  font-size: 0.9rem;
+  text-align: center;
+  color: #666;
+}
+
+.modal__cambio a {
+  color: #7c3aed;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.modal__cambio a:hover {
+  color: #5b21b6;
+  text-decoration: underline;
+}

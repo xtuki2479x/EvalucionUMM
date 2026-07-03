@@ -29,7 +29,7 @@
         class="btn btn--secundario"
         type="button"
       >
-        Iniciar sesión
+        Autenticación
       </button>
 
       <a
@@ -451,7 +451,7 @@
       </button>
 
       <h2 id="titulo-sesion" class="modal__titulo">
-        Acceso de usuario
+        Iniciar Sesión
       </h2>
 
       <div class="campo">
@@ -494,7 +494,100 @@
         Iniciar sesión
       </button>
 
+      <p class="modal__cambio">
+          ¿No tienes una cuenta?
+          <a href="#" id="mostrar-registro">
+              Regístrate aquí
+          </a>
+      </p>
+
     </form>
+
+    <form id="form-registro" class="modal__caja hidden">
+
+        <button
+            class="modal__cerrar"
+            type="button"
+            data-cerrar-modal
+            aria-label="Cerrar"
+        >
+            ✕
+        </button>
+
+        <h2 class="modal__titulo">
+            Registro de usuario
+        </h2>
+
+        <div class="campo">
+            <label for="registro-nombre">Nombre</label>
+
+            <input
+                id="registro-nombre"
+                type="text"
+                required
+                placeholder="Tu nombre"
+            >
+        </div>
+
+        <div class="campo">
+            <label for="registro-correo">Correo</label>
+
+            <input
+                id="registro-correo"
+                type="email"
+                required
+                placeholder="correo@ejemplo.com"
+            >
+        </div>
+
+        <div class="campo">
+            <label for="registro-password">
+                Contraseña
+            </label>
+
+            <input
+                id="registro-password"
+                type="password"
+                minlength="8"
+                required
+            >
+        </div>
+
+        <div class="campo">
+            <label for="registro-confirmar">
+                Confirmar contraseña
+            </label>
+
+            <input
+                id="registro-confirmar"
+                type="password"
+                minlength="8"
+                required
+            >
+        </div>
+
+        <p
+            id="mensaje-registro"
+            class="mensaje-sesion hidden"
+        ></p>
+
+        <button
+            class="btn btn--primario btn--bloque"
+            type="submit"
+        >
+            Registrarse
+        </button>
+
+        <p class="modal__cambio">
+            ¿Ya tienes una cuenta?
+
+            <a href="#" id="mostrar-login">
+                Inicia sesión
+            </a>
+        </p>
+
+    </form>
+
   </div>
 
   <div id="toast-container"></div>

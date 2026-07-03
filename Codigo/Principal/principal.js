@@ -399,6 +399,20 @@ document.addEventListener("DOMContentLoaded", () => {
     );
 
   document
+    .getElementById("mostrar-registro")
+    .addEventListener(
+        "click",
+        mostrarRegistro
+    );
+
+  document
+    .getElementById("mostrar-login")
+    .addEventListener(
+        "click",
+        mostrarLogin
+    );  
+
+  document
     .querySelectorAll("[data-calcular]")
     .forEach((boton) => {
       boton.addEventListener(
@@ -633,9 +647,44 @@ async function manejarSesion() {
 }
 
 function cerrarModalSesion() {
+
   document
     .getElementById("modal-sesion")
     .classList.add("hidden");
+
+  document
+    .getElementById("form-registro")
+    .classList.add("hidden");
+
+  document
+    .getElementById("form-sesion")
+    .classList.remove("hidden");
+
+  mostrarMensajeSesion("");
+}
+
+function mostrarRegistro(evento) {
+    evento.preventDefault();
+
+    document
+        .getElementById("form-sesion")
+        .classList.add("hidden");
+
+    document
+        .getElementById("form-registro")
+        .classList.remove("hidden");
+}
+
+function mostrarLogin(evento) {
+    evento.preventDefault();
+
+    document
+        .getElementById("form-registro")
+        .classList.add("hidden");
+
+    document
+        .getElementById("form-sesion")
+        .classList.remove("hidden");
 }
 
 async function iniciarSesion(evento) {
@@ -767,9 +816,11 @@ function actualizarSesion() {
       "btn-sesion"
     );
 
-  boton.textContent = sesion
-    ? `Salir (${sesion.nombre})`
-    : "Iniciar sesión";
+  if (sesion) {
+      boton.textContent = `Salir (${sesion.nombre})`;
+  } else {
+      boton.textContent = "Autenticación";
+  }
 }
 
 
