@@ -439,7 +439,7 @@
     aria-modal="true"
     aria-labelledby="titulo-sesion"
   >
-    <form id="form-sesion" class="modal__caja">
+    <form id="form-sesion" class="modal__caja" novalidate>
 
       <button
         class="modal__cerrar"
@@ -503,7 +503,7 @@
 
     </form>
 
-    <form id="form-registro" class="modal__caja hidden">
+    <form id="form-registro" class="modal__caja hidden" novalidate>
 
         <button
             class="modal__cerrar"
@@ -522,11 +522,13 @@
             <label for="registro-nombre">Nombre</label>
 
             <input
-                id="registro-nombre"
-                type="text"
-                required
-                placeholder="Tu nombre"
-            >
+              id="registro-nombre"
+              type="text"
+              required
+              minlength="2"
+              maxlength="100"
+              placeholder="Tu nombre"
+            />
         </div>
 
         <div class="campo">
@@ -569,9 +571,12 @@
         <p
             id="mensaje-registro"
             class="mensaje-sesion hidden"
+            role="status" 
+            aria-live="polite"
         ></p>
 
         <button
+            id="btn-enviar-registro"
             class="btn btn--primario btn--bloque"
             type="submit"
         >

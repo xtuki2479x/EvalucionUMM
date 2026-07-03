@@ -360,10 +360,6 @@ document.addEventListener("DOMContentLoaded", () => {
   );
 
   document
-    .getElementById("form-registro")
-    .addEventListener("submit", registrarUsuario);
-
-  document
     .querySelectorAll(".flecha")
     .forEach((boton) => {
       boton.addEventListener(
@@ -382,11 +378,13 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
   document
-    .querySelector("[data-cerrar-modal]")
-    .addEventListener(
-      "click",
-      cerrarModalSesion
-    );
+    .querySelectorAll("[data-cerrar-modal]")
+    .forEach((boton) => {
+      boton.addEventListener(
+        "click",
+        cerrarModalSesion
+      );
+    });
 
   document
     .getElementById("btn-sesion")
@@ -403,18 +401,35 @@ document.addEventListener("DOMContentLoaded", () => {
     );
 
   document
-    .getElementById("mostrar-registro")
+    .getElementById("form-registro")
     .addEventListener(
-        "click",
-        mostrarRegistro
+      "submit",
+      registrarUsuario
     );
 
   document
+    .getElementById("mostrar-registro")
+    .addEventListener("click", mostrarRegistro);
+
+  document
     .getElementById("mostrar-login")
-    .addEventListener(
-        "click",
-        mostrarLogin
-    );  
+    .addEventListener("click", mostrarLogin);
+
+  document
+    .querySelectorAll(
+      "#form-registro input"
+    )
+    .forEach((input) => {
+      input.addEventListener(
+        "input",
+        () => {
+          mostrarMensajeRegistro("");
+          actualizarBotonRegistro();
+        }
+      );
+    });
+
+  actualizarBotonRegistro();
 
   document
     .querySelectorAll("[data-calcular]")
@@ -651,10 +666,39 @@ async function manejarSesion() {
 }
 
 function cerrarModalSesion() {
-
   document
     .getElementById("modal-sesion")
     .classList.add("hidden");
+
+  document
+    .getElementById("form-sesion")
+    .classList.remove("hidden");
+
+  document
+    .getElementById("form-registro")
+    .classList.add("hidden");
+
+  mostrarMensajeSesion("");
+  mostrarMensajeRegistro("");
+}
+
+function mostrarRegistro(evento) {
+  evento.preventDefault();
+
+  document
+    .getElementById("form-sesion")
+    .classList.add("hidden");
+
+  document
+    .getElementById("form-registro")
+    .classList.remove("hidden");
+
+  mostrarMensajeSesion("");
+  mostrarMensajeRegistro("");
+}
+
+function mostrarLogin(evento) {
+  evento.preventDefault();
 
   document
     .getElementById("form-registro")
@@ -665,30 +709,7 @@ function cerrarModalSesion() {
     .classList.remove("hidden");
 
   mostrarMensajeSesion("");
-}
-
-function mostrarRegistro(evento) {
-    evento.preventDefault();
-
-    document
-        .getElementById("form-sesion")
-        .classList.add("hidden");
-
-    document
-        .getElementById("form-registro")
-        .classList.remove("hidden");
-}
-
-function mostrarLogin(evento) {
-    evento.preventDefault();
-
-    document
-        .getElementById("form-registro")
-        .classList.add("hidden");
-
-    document
-        .getElementById("form-sesion")
-        .classList.remove("hidden");
+  mostrarMensajeRegistro("");
 }
 
 async function iniciarSesion(evento) {
@@ -788,6 +809,22 @@ function mostrarMensajeSesion(mensaje, tipo = "") {
     : "mensaje-sesion hidden";
 }
 
+function mostrarMensajeRegistro(
+  mensaje,
+  tipo = ""
+) {
+  const elemento =
+    document.getElementById(
+      "mensaje-registro"
+    );
+
+  elemento.textContent = mensaje;
+
+  elemento.className = mensaje
+    ? `mensaje-sesion mensaje-sesion--${tipo}`
+    : "mensaje-sesion hidden";
+}
+
 async function sincronizarSesionBackend() {
   try {
     const respuesta = await fetch(
@@ -826,6 +863,8 @@ function actualizarSesion() {
       boton.textContent = "Autenticación";
   }
 }
+
+
 
 
 /* ==================================================
@@ -985,20 +1024,41 @@ function seleccionarPlan(nombrePlan) {
 async function registrarUsuario(evento) {
   evento.preventDefault();
 
-  const nombre = document.getElementById("registro-nombre").value.trim();
-  const correo = document.getElementById("registro-correo").value.trim().toLowerCase();
-  const password = document.getElementById("registro-password").value;
-  const confirmar = document.getElementById("registro-confirmar").value;
+  const nombre = document
+    .getElementById("registro-nombre")
+    .value
+    .trim();
 
-  if (password !== confirmar) {
-    mostrarMensajeRegistro("Las contraseñas no coinciden", "error");
+  const correo = document
+    .getElementById("registro-correo")
+    .value
+    .trim()
+    .toLowerCase();
+
+  const password = document
+    .getElementById("registro-password")
+    .value;
+
+  const confirmar = document
+    .getElementById("registro-confirmar")
+    .value;
+
+  const boton = document.getElementById("btn-enviar-registro");
+
+  if (!validarFormularioRegistro(
+    nombre,
+    correo,
+    password,
+    confirmar,
+    true
+  )) {
+    actualizarBotonRegistro();
     return;
   }
 
-  const boton = evento.target.querySelector("button");
-
   boton.disabled = true;
-  boton.textContent = "Creando cuenta...";
+  boton.textContent = "Registrando...";
+  mostrarMensajeRegistro("");
 
   try {
     const respuesta = await fetch("/api/auth/register", {
@@ -1012,29 +1072,78 @@ async function registrarUsuario(evento) {
     const datos = await respuesta.json();
 
     if (!respuesta.ok) {
-      throw new Error(datos.mensaje);
+      throw new Error(datos.mensaje || "Error al registrar usuario");
     }
 
     guardar(KEYS.sesion, datos.usuario);
-    cerrarModalSesion();
     actualizarSesion();
+    mostrarMensajeRegistro(datos.mensaje, "success");
     mostrarToast(datos.mensaje);
 
-    evento.target.reset();
+    document.getElementById("form-registro").reset();
+    actualizarBotonRegistro();
+    cerrarModalSesion();
 
   } catch (error) {
     mostrarMensajeRegistro(error.message, "error");
   } finally {
     boton.disabled = false;
     boton.textContent = "Registrarse";
+    actualizarBotonRegistro();
   }
 }
 
-function mostrarMensajeRegistro(mensaje, tipo = "") {
-  const elemento = document.getElementById("mensaje-registro");
+function obtenerDatosRegistro() {
+  return {
+    nombre: document
+      .getElementById("registro-nombre")
+      .value
+      .trim(),
+    correo: document
+      .getElementById("registro-correo")
+      .value
+      .trim()
+      .toLowerCase(),
+    password: document
+      .getElementById("registro-password")
+      .value,
+    confirmar: document
+      .getElementById("registro-confirmar")
+      .value
+  };
+}
 
-  elemento.textContent = mensaje;
-  elemento.className = mensaje
-    ? `mensaje-sesion mensaje-sesion--${tipo}`
-    : "mensaje-sesion hidden";
+function validarFormularioRegistro(
+  nombre,
+  correo,
+  password,
+  confirmar,
+  mostrarMensaje = false
+) {
+  const regexCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  let mensaje = "";
+
+  if (!nombre || nombre.length < 2) {
+    mensaje = "El nombre debe tener al menos 2 caracteres.";
+  } else if (!regexCorreo.test(correo)) {
+    mensaje = "Ingresa un correo electrónico válido.";
+  } else if (password.length < 8) {
+    mensaje = "La contraseña debe tener mínimo 8 caracteres.";
+  } else if (password !== confirmar) {
+    mensaje = "Las contraseñas no coinciden.";
+  }
+
+  if (mostrarMensaje) {
+    mostrarMensajeRegistro(mensaje, mensaje ? "error" : "");
+  }
+
+  return mensaje === "";
+}
+
+function actualizarBotonRegistro() {
+  const boton = document
+    .getElementById("btn-enviar-registro");
+
+  boton.disabled = false;
 }
