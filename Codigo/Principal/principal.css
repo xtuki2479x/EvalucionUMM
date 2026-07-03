@@ -388,3 +388,24 @@
 .footer .texto-suave {
     font-size: .9rem;
 }
+
+/* ========================================
+   MENSAJES DE AUTENTICACIÓN
+======================================== */
+
+.mensaje-sesion {
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: .9rem;
+}
+
+.mensaje-sesion--error {
+  color: #ffd7dc;
+  background: rgba(190, 45, 65, .18);
+  border: 1px solid rgba(255, 105, 125, .45);
+}
+
+#btn-enviar-sesion:disabled {
+  cursor: wait;
+  opacity: .7;
+}
