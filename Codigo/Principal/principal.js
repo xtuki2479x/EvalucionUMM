@@ -788,9 +788,9 @@ function validarFormularioSesion(correo, password) {
     return false;
   }
 
-  if (password.length < 8) {
+  if (password.length < 6) {
     mostrarMensajeSesion(
-      "La contraseña debe tener al menos 8 caracteres.",
+      "La contraseña debe tener al menos 6 caracteres.",
       "error"
     );
     return false;
@@ -1128,8 +1128,8 @@ function validarFormularioRegistro(
     mensaje = "El nombre debe tener al menos 2 caracteres.";
   } else if (!regexCorreo.test(correo)) {
     mensaje = "Ingresa un correo electrónico válido.";
-  } else if (password.length < 8) {
-    mensaje = "La contraseña debe tener mínimo 8 caracteres.";
+  } else if (password.length < 6) {
+    mensaje = "La contraseña debe tener mínimo 6 caracteres.";
   } else if (password !== confirmar) {
     mensaje = "Las contraseñas no coinciden.";
   }

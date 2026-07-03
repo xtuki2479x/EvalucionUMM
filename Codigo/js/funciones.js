@@ -5,8 +5,7 @@
 const KEYS = {
   servicios: "app_servicios",
   carrito: "app_carrito",
-  sesion: "app_sesion",
-  mensajes: "app_mensajes"
+  sesion: "app_sesion"
 };
 
 const IMG_DEFAULT =
@@ -481,17 +480,12 @@ function eliminarCarrito(idItem) {
 
 
 /* ========================================
-   SESIÓN Y MENSAJES
+   SESIÓN
 ======================================== */
 
 function getSesion() {
   return leer(KEYS.sesion, null);
 }
-
-function getMensajes() {
-  return leer(KEYS.mensajes, []);
-}
-
 
 /* ========================================
    UTILIDADES
