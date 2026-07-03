@@ -360,6 +360,10 @@ document.addEventListener("DOMContentLoaded", () => {
   );
 
   document
+    .getElementById("form-registro")
+    .addEventListener("submit", registrarUsuario);
+
+  document
     .querySelectorAll(".flecha")
     .forEach((boton) => {
       boton.addEventListener(
@@ -975,4 +979,62 @@ function seleccionarPlan(nombrePlan) {
   mostrarToast(
     `${nombrePlan} seleccionado. La administradora te contactará.`
   );
+}
+
+
+async function registrarUsuario(evento) {
+  evento.preventDefault();
+
+  const nombre = document.getElementById("registro-nombre").value.trim();
+  const correo = document.getElementById("registro-correo").value.trim().toLowerCase();
+  const password = document.getElementById("registro-password").value;
+  const confirmar = document.getElementById("registro-confirmar").value;
+
+  if (password !== confirmar) {
+    mostrarMensajeRegistro("Las contraseñas no coinciden", "error");
+    return;
+  }
+
+  const boton = evento.target.querySelector("button");
+
+  boton.disabled = true;
+  boton.textContent = "Creando cuenta...";
+
+  try {
+    const respuesta = await fetch("/api/auth/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ nombre, correo, password })
+    });
+
+    const datos = await respuesta.json();
+
+    if (!respuesta.ok) {
+      throw new Error(datos.mensaje);
+    }
+
+    guardar(KEYS.sesion, datos.usuario);
+    cerrarModalSesion();
+    actualizarSesion();
+    mostrarToast(datos.mensaje);
+
+    evento.target.reset();
+
+  } catch (error) {
+    mostrarMensajeRegistro(error.message, "error");
+  } finally {
+    boton.disabled = false;
+    boton.textContent = "Registrarse";
+  }
+}
+
+function mostrarMensajeRegistro(mensaje, tipo = "") {
+  const elemento = document.getElementById("mensaje-registro");
+
+  elemento.textContent = mensaje;
+  elemento.className = mensaje
+    ? `mensaje-sesion mensaje-sesion--${tipo}`
+    : "mensaje-sesion hidden";
 }

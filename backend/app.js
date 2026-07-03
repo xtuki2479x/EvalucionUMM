@@ -48,6 +48,69 @@ function crearAplicacion(opciones = {}) {
       .toLowerCase();
     const password = String(req.body.password || "");
 
+  app.post("/api/auth/register", async (req, res) => {
+    const nombre = String(req.body.nombre || "").trim();
+    const correo = String(req.body.correo || "").trim().toLowerCase();
+    const password = String(req.body.password || "");
+
+    if (!nombre || nombre.length < 2) {
+      return res.status(400).json({
+        mensaje: "El nombre debe tener al menos 2 caracteres."
+      });
+    }
+
+    if (!EXPRESION_CORREO.test(correo)) {
+      return res.status(400).json({
+        mensaje: "Ingresa un correo electrónico válido."
+      });
+    }
+
+    if (password.length < 8) {
+      return res.status(400).json({
+        mensaje: "La contraseña debe tener al menos 8 caracteres."
+      });
+    }
+
+    // verificar si ya existe usuario
+    const existente = obtenerUsuarioPorCorreo(baseDatos, correo);
+
+    if (existente) {
+      return res.status(409).json({
+        mensaje: "Este correo ya está registrado."
+      });
+    }
+
+    const password_hash = await bcrypt.hash(password, 10);
+
+    const password_hash = await bcrypt.hash(password, 10);
+
+    const stmt = baseDatos.prepare(`
+      INSERT INTO usuarios (nombre, correo, password)
+      VALUES (?, ?, ?)
+    `);
+
+    const result = stmt.run(nombre, correo, password_hash);
+
+    const result = stmt.run(nombre, correo, password_hash);
+
+    const usuario = obtenerUsuarioPorCorreo(baseDatos, correo);
+
+    req.session.usuario = usuarioPublico(usuario);
+
+    return req.session.save((error) => {
+      if (error) {
+        return res.status(500).json({
+          mensaje: "Error al crear sesión."
+        });
+      }
+
+      return res.json({
+        mensaje: "Usuario registrado correctamente.",
+        usuario: req.session.usuario
+      });
+    });
+  });
+
     if (!EXPRESION_CORREO.test(correo)) {
       return res.status(400).json({
         mensaje: "Ingresa un correo electrónico válido."
@@ -62,9 +125,8 @@ function crearAplicacion(opciones = {}) {
 
     const usuario = obtenerUsuarioPorCorreo(baseDatos, correo);
     const credencialesValidas =
-      usuario &&
-      usuario.activo === 1 &&
-      (await bcrypt.compare(password, usuario.password_hash));
+    usuario &&
+    (await bcrypt.compare(password, usuario.password));
 
     if (!credencialesValidas) {
       return res.status(401).json({
