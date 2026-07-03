@@ -196,8 +196,7 @@ function mostrarCarritoVacio(contenedor) {
    FINALIZAR COMPRA
 ======================================== */
 
-function finalizarCompra() {
-  const sesion = getSesion();
+async function finalizarCompra() {
   const carrito = getCarrito();
 
   if (carrito.length === 0) {
@@ -208,54 +207,61 @@ function finalizarCompra() {
     return;
   }
 
-  if (!sesion) {
-    mostrarToast(
-      "Primero debes iniciar sesión"
-    );
+  const boton = document.getElementById(
+    "finalizar-compra"
+  );
 
-    setTimeout(() => {
-      window.location.href =
-        "../Principal/principal.html";
-    }, 1400);
+  boton.disabled = true;
+  boton.textContent = "Procesando...";
 
-    return;
+  try {
+    const productos = carrito.map((item) => ({
+      servicioNombre: item.nombre,
+      precio: Number(item.precio),
+      cantidad: 1
+    }));
+
+    const respuesta = await fetch("/api/orders", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ productos })
+    });
+    const datos = await respuesta.json();
+
+    if (respuesta.status === 401) {
+      localStorage.removeItem(KEYS.sesion);
+      mostrarToast("Primero debes iniciar sesión");
+
+      setTimeout(() => {
+        window.location.href =
+          "../Principal/principal.html";
+      }, 1400);
+
+      return;
+    }
+
+    if (!respuesta.ok) {
+      throw new Error(
+        datos.mensaje ||
+        "No fue posible registrar la compra."
+      );
+    }
+
+    guardar(KEYS.carrito, []);
+    EventBus.publish("carritoActualizado", []);
+    renderizarCarrito();
+
+    document
+      .getElementById("modal-compra")
+      .classList.remove("hidden");
+  } catch (error) {
+    mostrarToast(error.message);
+  } finally {
+    boton.textContent = "Finalizar compra";
+    boton.disabled = getCarrito().length === 0;
   }
-
-  const orden = {
-    id: crearId(),
-    usuario: sesion,
-    productos: carrito,
-    fecha: new Date().toISOString(),
-    estado: "Pendiente"
-  };
-
-  const ordenes = leer(
-    "mee_ordenes",
-    []
-  );
-
-  ordenes.push(orden);
-
-  guardar(
-    "mee_ordenes",
-    ordenes
-  );
-
-  guardar(
-    KEYS.carrito,
-    []
-  );
-
-  EventBus.publish(
-    "carritoActualizado",
-    []
-  );
-
-  renderizarCarrito();
-
-  document
-    .getElementById("modal-compra")
-    .classList.remove("hidden");
 }
 
 
